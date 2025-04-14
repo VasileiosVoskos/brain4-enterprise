@@ -4,7 +4,7 @@ from openai import OpenAI
 st.title("⚙️ Ρυθμίσεις")
 st.write("Διαχειρίσου τις ρυθμίσεις του brain4 Enterprise.")
 
-client = OpenAI(api_key=st.secrets["openai_api_key"])
+client = OpenAI(api_key=st.secrets["openai"]["openai_api_key"])
 SENDGRID_API_KEY = st.secrets["sendgrid_api_key"]
 
 if st.button("🔄 Αναβάθμιση App"):
