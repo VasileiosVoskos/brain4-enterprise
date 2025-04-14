@@ -3,11 +3,12 @@ import pandas as pd
 from fpdf import FPDF
 import os
 import sendgrid
-from sendgrid.helpers.mail import Mail
+from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
+import base64
 
 st.title("📄 Reports")
 
-# 🔥 Secrets
+# ✅ Secrets
 SENDGRID_API_KEY = st.secrets["sendgrid"]["sendgrid_api_key"]
 FROM_EMAIL = st.secrets["sendgrid"]["sender_email"]
 TO_EMAIL = st.secrets["sendgrid"]["receiver_email"]
@@ -50,8 +51,19 @@ if os.path.exists("uploaded_data.csv"):
                 subject='brain4 Enterprise Report',
                 html_content='<strong>Δες το επισυναπτόμενο Report.</strong>'
             )
+
             with open("brain4_report.pdf", "rb") as f:
-                message.add_attachment(f.read(), maintype='application', subtype='pdf', filename='brain4_report.pdf')
+                data = f.read()
+                encoded_file = base64.b64encode(data).decode()
+
+            attachedFile = Attachment(
+                FileContent(encoded_file),
+                FileName('brain4_report.pdf'),
+                FileType('application/pdf'),
+                Disposition('attachment')
+            )
+
+            message.attachment = attachedFile
 
             sg = sendgrid.SendGridAPIClient(api_key=SENDGRID_API_KEY)
             response = sg.send(message)
