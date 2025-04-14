@@ -19,7 +19,7 @@ if os.path.exists("uploaded_data.csv"):
         try:
             pdf = FPDF()
             pdf.add_page()
-            pdf.set_font("DejaVu", size=12)
+            pdf.set_font("Arial", size=12)
 
             pdf.cell(200, 10, txt="brain4 Enterprise Report", ln=True, align='C')
 
