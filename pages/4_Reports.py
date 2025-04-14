@@ -1,10 +1,12 @@
 from fpdf import FPDF
+import os
 
 pdf = FPDF()
 pdf.add_page()
 
-# ✅ Προσθήκη Unicode γραμματοσειράς
-pdf.add_font('DejaVu', '', 'DejaVuSans.ttf', uni=True)
+# ✅ Ο σωστός path για το VPS σου
+font_path = os.path.join("assets", "DejaVuSans.ttf")
+pdf.add_font('DejaVu', '', font_path, uni=True)
 pdf.set_font("DejaVu", size=12)
 
 pdf.cell(200, 10, txt="brain4 Enterprise Report", ln=True, align='C')
