@@ -4,7 +4,6 @@ from openai import OpenAI
 st.title("⚙️ Ρυθμίσεις")
 st.write("Διαχειρίσου τις ρυθμίσεις του brain4 Enterprise.")
 
-# Διορθωμένο path για τα secrets
 client = OpenAI(api_key=st.secrets["openai"]["openai_api_key"])
 SENDGRID_API_KEY = st.secrets["sendgrid"]["sendgrid_api_key"]
 
@@ -19,4 +18,3 @@ if st.button("🧩 Έλεγχος Συνδέσεων API"):
             st.error("Πρόβλημα με τις συνδέσεις API.")
     except Exception as e:
         st.error(f"Πρόβλημα με τις συνδέσεις API: {e}")
-
