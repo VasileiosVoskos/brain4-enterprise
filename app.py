@@ -22,9 +22,9 @@ page = st.sidebar.selectbox("Επιλογή Σελίδας", ("Dashboard", "Αν
 client = OpenAI(api_key=st.secrets["openai"]["openai_api_key"])
 
 # Email setup
-SENDGRID_API_KEY = st.secrets["sendgrid_api_key"]
-FROM_EMAIL = st.secrets["sender_email"]
-TO_EMAIL = st.secrets["receiver_email"]
+SENDGRID_API_KEY = st.secrets["sendgrid"]["sendgrid_api_key"]
+FROM_EMAIL = st.secrets["sendgrid"]["sender_email"]
+TO_EMAIL = st.secrets["sendgrid"]["receiver_email"]
 
 # App pages
 if page == "Dashboard":
@@ -41,11 +41,9 @@ elif page == "Ανέβασμα & Ανάλυση":
             st.subheader("📊 Τα δεδομένα σου:")
             st.dataframe(df)
 
-            # Ανάλυση δεδομένων
             st.subheader("📈 Ανάλυση Δεδομένων")
             st.bar_chart(df.select_dtypes(include=['number']))
 
-            # Αποθήκευση δεδομένων για άλλα pages
             df.to_csv("uploaded_data.csv", index=False)
 
         except Exception as e:
@@ -54,7 +52,6 @@ elif page == "Ανέβασμα & Ανάλυση":
 elif page == "AI Σύμβουλος":
     st.title("🤖 AI Σύμβουλος")
 
-    # Ανάγνωση αποθηκευμένων δεδομένων
     if os.path.exists("uploaded_data.csv"):
         df = pd.read_csv("uploaded_data.csv")
         st.write("📊 Δεδομένα προς ανάλυση:")
