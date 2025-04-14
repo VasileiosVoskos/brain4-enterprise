@@ -1,15 +1,15 @@
 import streamlit as st
 import pandas as pd
-import os
 from fpdf import FPDF
+import os
 import sendgrid
 from sendgrid.helpers.mail import Mail
 
 st.title("📄 Reports")
 
-SENDGRID_API_KEY = st.secrets["sendgrid_api_key"]
-FROM_EMAIL = st.secrets["sender_email"]
-TO_EMAIL = st.secrets["receiver_email"]
+SENDGRID_API_KEY = st.secrets["sendgrid"]["sendgrid_api_key"]
+FROM_EMAIL = st.secrets["sendgrid"]["sender_email"]
+TO_EMAIL = st.secrets["sendgrid"]["receiver_email"]
 
 if os.path.exists("uploaded_data.csv"):
     df = pd.read_csv("uploaded_data.csv")
