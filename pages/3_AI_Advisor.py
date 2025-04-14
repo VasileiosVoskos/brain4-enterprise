@@ -1,14 +1,12 @@
 import streamlit as st
+from openai import OpenAI
 import pandas as pd
 import os
-from openai import OpenAI
 
 st.title("🤖 AI Σύμβουλος")
 
-# OpenAI API setup
-client = OpenAI(api_key=st.secrets["openai_api_key"])
+client = OpenAI(api_key=st.secrets["openai"]["openai_api_key"])
 
-# Ανάγνωση αποθηκευμένων δεδομένων
 if os.path.exists("uploaded_data.csv"):
     df = pd.read_csv("uploaded_data.csv")
     st.write("📊 Δεδομένα προς ανάλυση:")
