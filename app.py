@@ -19,7 +19,7 @@ st.sidebar.image(logo, use_column_width=True)
 page = st.sidebar.selectbox("Επιλογή Σελίδας", ("Dashboard", "Ανέβασμα & Ανάλυση", "AI Σύμβουλος", "Reports", "Settings"))
 
 # OpenAI API setup
-client = OpenAI(api_key=st.secrets["openai_api_key"])
+client = OpenAI(api_key=st.secrets["openai"]["openai_api_key"])
 
 # Email setup
 SENDGRID_API_KEY = st.secrets["sendgrid_api_key"]
