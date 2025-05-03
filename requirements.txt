@@ -1,8 +1,0 @@
-streamlit
-openai
-pandas
-matplotlib
-fpdf
-sendgrid
-Pillow
-openpyxl
