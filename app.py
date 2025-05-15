@@ -1,7 +1,10 @@
-import importlib, json, os, streamlit as st
+import importlib
+import json
+import os
+import streamlit as st
 from pathlib import Path
 from openai import OpenAI
-from datetime import datetime, timedelta
+import datetime  # Changed this line
 
 # Professional page configuration
 st.set_page_config(
@@ -112,7 +115,7 @@ def auth():
                     users[u] = {
                         "pwd": p,
                         "role": "admin" if code == "ADMINCODE" else "user",
-                        "created_at": str(datetime.now())
+                        "created_at": str(datetime.datetime.now())  # Changed this line
                     }
                     dump(USERS, users)
                     st.success("✅ Account created successfully! Please sign in.")
