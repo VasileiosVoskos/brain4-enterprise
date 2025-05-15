@@ -1,4 +1,3 @@
-# pages/car/upload.py
 import streamlit as st
 import pandas as pd
 from datetime import datetime
@@ -58,7 +57,7 @@ with col2:
         'Date': ['2024-03-01', '2024-02-28', '2024-02-27'],
         'Status': ['Verified', 'Pending', 'Verified']
     })
-    st.dataframe(recent_docs, hide_index=True)
+    st.dataframe(recent_docs, hide_index=True, use_container_width=True)
 
 # Document Analysis
 st.markdown("### 📊 Document Analysis")
@@ -79,7 +78,7 @@ with tab2:
         'Expiration': ['2024-04-15', '2024-04-20', '2024-05-01'],
         'Days Left': [45, 50, 61]
     })
-    st.dataframe(expiring_docs, hide_index=True)
+    st.dataframe(expiring_docs, hide_index=True, use_container_width=True)
 
 # Batch Operations
 st.markdown("### 🔧 Batch Operations")
