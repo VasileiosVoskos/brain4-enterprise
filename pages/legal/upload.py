@@ -1,4 +1,3 @@
-# pages/legal/upload.py
 import streamlit as st
 import pandas as pd
 from datetime import datetime
@@ -57,7 +56,7 @@ with col2:
         'Date': ['2024-03-01', '2024-02-28', '2024-02-27'],
         'Status': ['Active', 'Under Review', 'Active']
     })
-    st.dataframe(recent_docs, hide_index=True)
+    st.dataframe(recent_docs, hide_index=True, use_container_width=True)
 
 # Document Tracking
 st.markdown("### 📊 Document Status")
@@ -78,7 +77,7 @@ with tab2:
         'Expiration': ['2024-04-15', '2024-04-30', '2024-05-15'],
         'Days Left': [45, 60, 75]
     })
-    st.dataframe(expiring_docs, hide_index=True)
+    st.dataframe(expiring_docs, hide_index=True, use_container_width=True)
 
 # Document Actions
 st.markdown("### 🔧 Document Actions")
