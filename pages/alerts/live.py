@@ -1,4 +1,3 @@
-# pages/alerts/live.py
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -50,7 +49,8 @@ def color_priority(val):
 
 st.dataframe(
     alerts.style.applymap(color_priority, subset=['Priority']),
-    hide_index=True
+    hide_index=True,
+    use_container_width=True
 )
 
 # Alert Analytics
@@ -115,4 +115,4 @@ with st.expander("Alert History"):
         'Resolution': ['Scaled resources', 'Router restart', 'Updated firewall'],
         'Duration': ['45 min', '30 min', '15 min']
     })
-    st.dataframe(history_data, hide_index=True)
+    st.dataframe(history_data, hide_index=True, use_container_width=True)
