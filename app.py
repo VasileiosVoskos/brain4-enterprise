@@ -1,7 +1,7 @@
 import importlib, json, os, streamlit as st
 from pathlib import Path
 from openai import OpenAI
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Professional page configuration
 st.set_page_config(
@@ -39,6 +39,12 @@ st.markdown("""
 DATA_DIR = Path("data")
 USERS = DATA_DIR / "users.json"
 INV = DATA_DIR / "invite_codes.json"
+
+# Create data directory if it doesn't exist
+if not DATA_DIR.exists():
+    DATA_DIR.mkdir(parents=True)
+
+# Initialize files if they don't exist
 for f in (USERS, INV):
     if not f.exists():
         f.write_text("{}")
@@ -125,46 +131,37 @@ SECTIONS = {
     "Enterprise Dashboard": ["pages.dashboard.overview"],
     "Fleet Management": [
         "pages.car.dashboard",
-        "pages.car.fleet",
-        "pages.car.analytics",
-        "pages.car.maintenance"
+        "pages.car.ai",
+        "pages.car.reports",
+        "pages.car.upload"
     ],
     "Document Center": [
-        "pages.legal.documents",
-        "pages.legal.contracts",
-        "pages.legal.compliance"
+        "pages.legal.ai",
+        "pages.legal.reports",
+        "pages.legal.upload"
     ],
     "Monitoring": [
-        "pages.alerts.dashboard",
-        "pages.alerts.notifications",
-        "pages.alerts.settings"
+        "pages.alerts.live"
     ],
     "Business Intelligence": [
-        "pages.ocr.documents",
-        "pages.ocr.analytics",
-        "pages.ocr.reports"
+        "pages.ocr.ocr_ai"
     ]
 }
 
 page_labels = {
-    "pages.dashboard.overview": "Enterprise Overview",
     # Fleet Management
     "pages.car.dashboard": "Fleet Dashboard",
-    "pages.car.fleet": "Fleet Management",
-    "pages.car.analytics": "Performance Analytics",
-    "pages.car.maintenance": "Maintenance Schedule",
+    "pages.car.ai": "AI Fleet Advisor",
+    "pages.car.reports": "Fleet Reports",
+    "pages.car.upload": "Document Upload",
     # Document Center
-    "pages.legal.documents": "Document Repository",
-    "pages.legal.contracts": "Contract Management",
-    "pages.legal.compliance": "Compliance Tracking",
+    "pages.legal.ai": "Legal AI Assistant",
+    "pages.legal.reports": "Legal Reports",
+    "pages.legal.upload": "Document Upload",
     # Monitoring
-    "pages.alerts.dashboard": "Alert Dashboard",
-    "pages.alerts.notifications": "Notification Center",
-    "pages.alerts.settings": "Alert Configuration",
+    "pages.alerts.live": "Live Alerts",
     # Business Intelligence
-    "pages.ocr.documents": "Document Processing",
-    "pages.ocr.analytics": "Analytics Dashboard",
-    "pages.ocr.reports": "Business Reports"
+    "pages.ocr.ocr_ai": "Document Processing"
 }
 
 # Professional navigation UI
