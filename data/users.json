@@ -1,1 +1,4 @@
-# Placeholder for users.json
+{
+  "ADMINCODE": "admin",
+  "TESTUSER": "user"
+}
