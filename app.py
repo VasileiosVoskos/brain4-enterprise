@@ -1,91 +1,93 @@
-import streamlit as st
+import importlib, json, os, streamlit as st
 from pathlib import Path
-import json, importlib, sys, os
+from openai import OpenAI
 
-# ───────────────── Glassmorphism CSS ─────────────────
-st.markdown(
-    """
-    <style>
-    section[data-testid='stSidebar'] > div:first-child{
-        background:rgba(255,255,255,.15)!important;
-        backdrop-filter:blur(12px)!important;border-right:1px
-        solid rgba(255,255,255,.25);}
-    [data-testid="stAppViewContainer"]>.main{
-        background:linear-gradient(135deg,#dff1ff 0%,#f4fafe 100%);
-        animation:grad 15s ease infinite;background-size:400% 400%;}
-    @keyframes grad{0%{background-position:0% 50%}
-      50%{background-position:100% 50%}100%{background-position:0% 50%}}
-    .glass-card{padding:1.2rem 1.6rem;border-radius:22px;
-      background:rgba(255,255,255,.25);backdrop-filter:blur(6px);
-      box-shadow:0 8px 32px rgba(31,38,135,.2);border:1px solid rgba(255,255,255,.25);
-      transition:.3s} .glass-card:hover{transform:translateY(-4px);
-      box-shadow:0 12px 40px rgba(31,38,135,.25)}
-    header,footer{visibility:hidden}
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+# ▸ Βασικές ρυθμίσεις σελίδας
+st.set_page_config(page_title="brain4 Enterprise", layout="wide")
 
-# ───────────────── Auth helpers ─────────────────
-USERS = Path("data/users.json")
-INV   = Path("data/invite_codes.json")
-USERS.parent.mkdir(parents=True, exist_ok=True)
-if not USERS.exists(): USERS.write_text("{}")
-if not INV.exists():   INV.write_text(json.dumps({"ADMINCODE": "admin"}))
+# --------- 1. Very-simple Auth (JSON) ------------------------------
+DATA_DIR = Path("data")
+USERS = DATA_DIR / "users.json"
+INV   = DATA_DIR / "invite_codes.json"
+for f in (USERS, INV):
+    if not f.exists():
+        f.write_text("{}")
 
-load = lambda p: json.loads(p.read_text())
-save = lambda p,d: p.write_text(json.dumps(d, indent=2))
+load  = lambda p: json.loads(p.read_text())
+dump  = lambda p,d: p.write_text(json.dumps(d, indent=2, ensure_ascii=False))
 
 def auth():
+    """Login / Register με invite codes — αποθηκεύονται σε JSON."""
     st.sidebar.image("assets/logo.png", width=160)
-    mode = st.sidebar.radio("Auth", ["Login", "Register"], horizontal=True)
-
     users, invites = load(USERS), load(INV)
-    if mode == "Login":
-        u = st.sidebar.text_input("User")
-        p = st.sidebar.text_input("Pass", type="password")
-        if st.sidebar.button("Login"):
-            if u in users and users[u]["pw"] == p:
-                st.session_state.user = u
-                st.session_state.role = users[u]["role"]
-            else:
-                st.sidebar.error("❌")
-    else:
-        u = st.sidebar.text_input("New user")
-        p = st.sidebar.text_input("Pass", type="password")
-        code = st.sidebar.text_input("Invite")
-        if st.sidebar.button("Register"):
-            if code in invites:
-                users[u] = {"pw": p, "role": invites[code]}
-                save(USERS, users)
-                st.sidebar.success("🎉 Τώρα κάνε Login")
-            else:
-                st.sidebar.error("Invalid invite")
 
-auth()
-if "user" not in st.session_state:
+    if "user" not in st.session_state:
+        st.session_state.user = None
+
+    if st.session_state.user:
+        st.sidebar.success(f"👋 Καλωσήρθες {st.session_state.user}")
+        if st.sidebar.button("Logout"):
+            st.session_state.user = None
+            st.experimental_rerun()
+        return True
+
+    tab_login, tab_reg = st.tabs(["🔑 Login", "🆕 Register"])
+
+    # --- login
+    with tab_login:
+        u = st.text_input("Username")
+        p = st.text_input("Password", type="password")
+        if st.button("Login") and u in users and users[u]["pwd"] == p:
+            st.session_state.user = u
+            st.experimental_rerun()
+
+    # --- register
+    with tab_reg:
+        u = st.text_input("Νέο username")
+        p = st.text_input("Νέο password", type="password")
+        code = st.text_input("Invite code")
+        if st.button("Register"):
+            if code in invites:
+                users[u] = {"pwd": p, "role": "admin" if code == "ADMINCODE" else "user"}
+                dump(USERS, users)
+                st.success("Ο λογαριασμός δημιουργήθηκε · κάνε login!")
+            else:
+                st.error("Μη έγκυρο invite code")
     st.stop()
 
-# ───────────────── Navigation ─────────────────
-sections = {
-    "Car":   ["Dashboard", "Upload", "AI", "Reports"],
-    "Legal": ["Upload", "AI", "Reports"],
-    "Alerts":["Live"],
-    "OCR":   ["OCR & KOK"],
+auth()  # αν δεν γίνει login σταματάει εδώ
+
+# --------- 2. Sidebar Navigation -----------------------------------
+SECTIONS = {
+    "Car":   ["pages.car.dashboard",
+              "pages.car.upload",
+              "pages.car.ai",
+              "pages.car.reports"],
+    "Legal": ["pages.legal.upload",
+              "pages.legal.ai",
+              "pages.legal.reports"],
+    "Alerts": ["pages.alerts.live"],
+    "OCR":   ["pages.ocr.analyser"],
 }
-sec  = st.sidebar.selectbox("Section", list(sections))
-page = st.sidebar.selectbox("Page",   sections[sec])
 
-module = (
-    "pages."
-    + sec.lower()
-    + "."
-    + page.lower().replace(" & ", "_").replace(" ", "_")
+page_labels = {
+    "pages.car.dashboard":     "Dashboard",
+    "pages.car.upload":        "Upload & Analysis",
+    "pages.car.ai":            "AI Advisor",
+    "pages.car.reports":       "Reports",
+    "pages.legal.upload":      "Upload & Analysis",
+    "pages.legal.ai":          "Legal AI",
+    "pages.legal.reports":     "Reports",
+    "pages.alerts.live":       "Live Alerts",
+    "pages.ocr.analyser":      "OCR Analyser",
+}
+
+section = st.sidebar.selectbox("Section", list(SECTIONS.keys()))
+page_key = st.sidebar.selectbox(
+    "Page", SECTIONS[section],
+    format_func=lambda k: page_labels.get(k, k)
 )
-if module not in sys.modules:
-    importlib.import_module(module)
-else:
-    importlib.reload(sys.modules[module])
 
-st.sidebar.caption(f"👤 {st.session_state.user}")
-# Placeholder for app.py
+# --------- 3. Load & run το ζητούμενο sub-module -------------------
+module_name = page_key.replace("/", ".")
+importlib.import_module(module_name)
