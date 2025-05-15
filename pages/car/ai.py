@@ -1,7 +1,7 @@
-# pages/car/ai.py
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import numpy as np
 from datetime import datetime
 
 st.markdown("## AI Fleet Advisor")
@@ -34,7 +34,8 @@ st.dataframe(
     maintenance_predictions.style.apply(lambda x: ['background: #ffcdd2' if x['Urgency'] == 'High' 
     else 'background: #fff59d' if x['Urgency'] == 'Medium'
     else 'background: #c8e6c9' for i in x], axis=1),
-    hide_index=True
+    hide_index=True,
+    use_container_width=True
 )
 
 # Route Optimization
