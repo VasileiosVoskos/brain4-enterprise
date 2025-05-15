@@ -1,116 +1,92 @@
-# pages/car/dashboard.py
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import numpy as np
 from datetime import datetime, timedelta
 
-st.markdown("## Fleet Management Dashboard")
+st.markdown("## Fleet Dashboard")
 
-# Dashboard Layout
+# Key Metrics
 col1, col2, col3, col4 = st.columns(4)
-
 with col1:
-    st.metric(
-        "Total Vehicles",
-        "127",
-        "+3 this month",
-        help="Total number of vehicles in fleet"
-    )
-
+    st.metric("Total Vehicles", "127", "+3 this month")
 with col2:
-    st.metric(
-        "Active Vehicles",
-        "112",
-        "-2 from yesterday",
-        help="Currently active vehicles"
-    )
-
+    st.metric("Active Vehicles", "112", "-2")
 with col3:
-    st.metric(
-        "Maintenance Due",
-        "15",
-        "+5",
-        help="Vehicles due for maintenance"
-    )
-
+    st.metric("Maintenance Due", "15", "+5")
 with col4:
-    st.metric(
-        "Fuel Efficiency",
-        "92%",
-        "+2%",
-        help="Fleet-wide fuel efficiency"
-    )
+    st.metric("Fleet Health", "94%", "+2%")
 
 # Fleet Status Overview
 st.markdown("### Fleet Status Overview")
-status_data = {
+status_data = pd.DataFrame({
     'Status': ['Active', 'Maintenance', 'Repair', 'Idle'],
-    'Count': [112, 8, 4, 3]
-}
-fig = px.pie(status_data, values='Count', names='Status', title='Fleet Status Distribution')
-st.plotly_chart(fig, use_container_width=True)
+    'Count': [112, 8, 4, 3],
+    'Percentage': [88, 6, 3, 3]
+})
 
-# Vehicle Analytics
-col1, col2 = st.columns(2)
-
+col1, col2 = st.columns([2, 1])
 with col1:
-    st.markdown("### Maintenance Schedule")
-    maintenance_data = {
-        'Vehicle': ['Truck 001', 'Van 023', 'Car 115', 'Truck 042', 'Van 007'],
-        'Due Date': ['2024-03-15', '2024-03-18', '2024-03-20', '2024-03-22', '2024-03-25'],
-        'Type': ['Regular', 'Extended', 'Regular', 'Regular', 'Extended']
-    }
-    st.dataframe(pd.DataFrame(maintenance_data), hide_index=True)
-
+    fig = px.pie(status_data, values='Count', names='Status', 
+                 title='Fleet Status Distribution')
+    st.plotly_chart(fig, use_container_width=True)
 with col2:
-    st.markdown("### Recent Alerts")
-    alerts_data = {
-        'Time': ['10:30 AM', '09:15 AM', '08:45 AM', '08:00 AM'],
-        'Vehicle': ['Van 023', 'Truck 001', 'Car 115', 'Van 007'],
-        'Alert': ['Low Fuel', 'Service Due', 'GPS Offline', 'Battery Low']
-    }
-    st.dataframe(pd.DataFrame(alerts_data), hide_index=True)
+    st.dataframe(status_data, hide_index=True, use_container_width=True)
 
 # Performance Metrics
 st.markdown("### Performance Metrics")
-tab1, tab2, tab3 = st.tabs(["Fuel Efficiency", "Maintenance Costs", "Utilization"])
+tabs = st.tabs(["Fuel Efficiency", "Maintenance Costs", "Utilization"])
 
-with tab1:
-    # Sample fuel efficiency data
+with tabs[0]:
+    # Generate sample data for fuel efficiency
     dates = pd.date_range(start='2024-01-01', end='2024-03-01', freq='D')
     efficiency = pd.DataFrame({
         'Date': dates,
         'Efficiency': [85 + i * 0.1 + np.random.randn() * 2 for i in range(len(dates))]
     })
-    fig = px.line(efficiency, x='Date', y='Efficiency', title='Fleet Fuel Efficiency Trend')
+    fig = px.line(efficiency, x='Date', y='Efficiency', 
+                  title='Fleet Fuel Efficiency Trend')
     st.plotly_chart(fig, use_container_width=True)
 
-with tab2:
-    # Sample maintenance cost data
+with tabs[1]:
     costs = pd.DataFrame({
         'Month': ['Jan', 'Feb', 'Mar'],
         'Planned': [12000, 15000, 13000],
         'Unplanned': [3000, 2000, 4000]
     })
-    fig = px.bar(costs, x='Month', y=['Planned', 'Unplanned'], title='Maintenance Costs')
+    fig = px.bar(costs, x='Month', y=['Planned', 'Unplanned'],
+                 title='Maintenance Costs')
     st.plotly_chart(fig, use_container_width=True)
 
-with tab3:
-    # Sample utilization data
+with tabs[2]:
     util = pd.DataFrame({
         'Vehicle Type': ['Trucks', 'Vans', 'Cars'],
         'Utilization': [85, 78, 92]
     })
-    fig = px.bar(util, x='Vehicle Type', y='Utilization', title='Fleet Utilization (%)')
+    fig = px.bar(util, x='Vehicle Type', y='Utilization',
+                 title='Fleet Utilization (%)')
     st.plotly_chart(fig, use_container_width=True)
 
-# Settings and Filters (collapsible)
+# Recent Alerts
+st.markdown("### Recent Alerts")
+alerts = pd.DataFrame({
+    'Time': ['10:30 AM', '09:15 AM', '08:45 AM'],
+    'Vehicle': ['TRK-001', 'VAN-023', 'CAR-115'],
+    'Alert Type': ['Maintenance Due', 'Low Fuel', 'Service Required'],
+    'Priority': ['High', 'Medium', 'Low']
+})
+st.dataframe(alerts, hide_index=True, use_container_width=True)
+
+# Dashboard Settings
 with st.expander("Dashboard Settings"):
-    st.markdown("### Configure Dashboard")
     col1, col2 = st.columns(2)
     with col1:
-        st.selectbox("Time Period", ["Last 7 Days", "Last 30 Days", "Last Quarter", "Year to Date"])
-        st.multiselect("Vehicle Types", ["All", "Trucks", "Vans", "Cars"])
+        st.selectbox("Update Frequency", 
+                    ["Real-time", "Every 5 minutes", "Every 15 minutes", "Every hour"])
+        st.multiselect("Vehicle Types to Display",
+                      ["All", "Trucks", "Vans", "Cars"])
     with col2:
-        st.selectbox("Refresh Rate", ["5 minutes", "15 minutes", "30 minutes", "1 hour"])
-        st.multiselect("Metrics to Display", ["Fuel Efficiency", "Maintenance", "Utilization", "Costs"])
+        st.selectbox("Time Range",
+                    ["Last 24 hours", "Last 7 days", "Last 30 days", "Custom"])
+        st.multiselect("Metrics to Show",
+                      ["Fuel Efficiency", "Maintenance", "Utilization", "Costs"])
