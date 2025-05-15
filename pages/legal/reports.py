@@ -1,4 +1,3 @@
-# pages/legal/reports.py
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -76,7 +75,7 @@ with tab3:
         'Current Score': [2, 1, 2],
         'Previous Score': [3, 1, 2]
     })
-    st.dataframe(risk_data, hide_index=True)
+    st.dataframe(risk_data, hide_index=True, use_container_width=True)
 
 # Document Tracking
 st.markdown("### 📑 Document Tracking")
@@ -86,7 +85,7 @@ doc_tracking = pd.DataFrame({
     'Expiration': ['2024-12-31', '2024-06-30', '2025-01-01'],
     'Risk Level': ['Low', 'Medium', 'Low']
 })
-st.dataframe(doc_tracking, hide_index=True)
+st.dataframe(doc_tracking, hide_index=True, use_container_width=True)
 
 # Report Scheduling
 with st.expander("Schedule Regular Reports"):
