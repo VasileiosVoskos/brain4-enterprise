@@ -1,17 +1,9 @@
-import importlib
-import json
-import os
-import time
-import streamlit as st
+import importlib, json, os, streamlit as st, time
 from pathlib import Path
 from openai import OpenAI
 
-# Professional page configuration
-st.set_page_config(
-    page_title="brain4 Enterprise",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+# Basic page settings
+st.set_page_config(page_title="brain4 Enterprise", layout="wide")
 
 # Data management setup
 DATA_DIR = Path("data")
@@ -31,86 +23,97 @@ load = lambda p: json.loads(p.read_text())
 dump = lambda p, d: p.write_text(json.dumps(d, indent=2, ensure_ascii=False))
 
 def auth():
-    """Secure authentication system with invite-based registration."""
-    # Changed from use_column_width to use_container_width
-    st.sidebar.image("assets/logo.png", width=160)  # Fixed width instead
+    """Login / Register with invite codes - stored in JSON."""
+    st.sidebar.image("assets/logo.png", width=160)
     users, invites = load(USERS), load(INV)
 
     if "user" not in st.session_state:
         st.session_state.user = None
 
     if st.session_state.user:
-        user_info = users[st.session_state.user]
-        st.sidebar.success(f"Welcome, {st.session_state.user}")
-        if st.sidebar.button("Sign Out"):
+        st.sidebar.success(f"👋 Welcome {st.session_state.user}")
+        if st.sidebar.button("Logout"):
             st.session_state.user = None
             st.experimental_rerun()
         return True
 
-    st.markdown("## Welcome to brain4 Enterprise")
-    st.markdown("Please sign in to access the platform.")
+    tab_login, tab_reg = st.tabs(["🔑 Login", "🆕 Register"])
 
-    tab_login, tab_reg = st.tabs(["🔑 Sign In", "🆕 Create Account"])
-
-    # Login interface
+    # --- login
     with tab_login:
-        with st.form("login_form"):
-            u = st.text_input("Username")
-            p = st.text_input("Password", type="password")
-            submit = st.form_submit_button("Sign In")
-            if submit and u in users and users[u]["pwd"] == p:
+        u = st.text_input("Username", key="login_username")
+        p = st.text_input("Password", type="password", key="login_password")
+        if st.button("Login"):
+            if u in users and users[u]["pwd"] == p:
                 st.session_state.user = u
                 st.experimental_rerun()
-            elif submit:
+            else:
                 st.error("Invalid credentials")
 
-    # Registration interface
+    # --- register
     with tab_reg:
-        with st.form("register_form"):
-            u = st.text_input("Username")
-            p = st.text_input("Password", type="password")
-            code = st.text_input("Invite Code")
-            submit = st.form_submit_button("Register")
-            if submit:
-                if code in invites:
-                    users[u] = {
-                        "pwd": p,
-                        "role": "admin" if code == "ADMINCODE" else "user",
-                        "created_at": str(int(time.time()))
-                    }
-                    dump(USERS, users)
-                    st.success("Account created! Please sign in.")
-                else:
-                    st.error("Invalid invite code")
+        u = st.text_input("New username", key="reg_username")
+        p = st.text_input("New password", type="password", key="reg_password")
+        code = st.text_input("Invite code")
+        if st.button("Register"):
+            if u in users:
+                st.error("Username already exists")
+            elif code in invites:
+                users[u] = {
+                    "pwd": p,
+                    "role": "admin" if code == "ADMINCODE" else "user",
+                    "created_at": str(int(time.time()))
+                }
+                dump(USERS, users)
+                st.success("Account created successfully! Please login.")
+            else:
+                st.error("Invalid invite code")
     st.stop()
 
 # Run authentication
 auth()
 
-# Navigation structure
+# Navigation Structure
 SECTIONS = {
-    "Fleet Management": [
+    "Car": [
         "pages.car.dashboard",
+        "pages.car.upload",
         "pages.car.ai",
-        "pages.car.reports",
-        "pages.car.upload"
+        "pages.car.reports"
     ],
     "Legal": [
+        "pages.legal.upload",
         "pages.legal.ai",
-        "pages.legal.reports",
-        "pages.legal.upload"
+        "pages.legal.reports"
     ],
     "Alerts": ["pages.alerts.live"],
-    "OCR": ["pages.ocr.ocr_ai"]
+    "OCR": ["pages.ocr.ocr_ai"]  # Updated to match your actual file
+}
+
+page_labels = {
+    "pages.car.dashboard": "Dashboard",
+    "pages.car.upload": "Upload & Analysis",
+    "pages.car.ai": "AI Advisor",
+    "pages.car.reports": "Reports",
+    "pages.legal.upload": "Upload & Analysis",
+    "pages.legal.ai": "Legal AI",
+    "pages.legal.reports": "Reports",
+    "pages.alerts.live": "Live Alerts",
+    "pages.ocr.ocr_ai": "OCR Analyser"  # Updated to match your actual file
 }
 
 # Navigation UI
 section = st.sidebar.selectbox("Section", list(SECTIONS.keys()))
-page_key = st.sidebar.selectbox("Page", SECTIONS[section])
+page_key = st.sidebar.selectbox(
+    "Page",
+    SECTIONS[section],
+    format_func=lambda k: page_labels.get(k, k)
+)
 
-# Load selected module
+# Load and run the selected module
 try:
     module_name = page_key.replace("/", ".")
-    page_module = importlib.import_module(module_name)
+    importlib.import_module(module_name)
 except Exception as e:
     st.error(f"Error loading page: {str(e)}")
+    st.info("Please check if all required files exist")
