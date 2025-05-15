@@ -1,4 +1,3 @@
-# pages/car/reports.py
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -79,7 +78,7 @@ with tab3:
         'Service': ['Oil Change', 'Brake Service', 'Tire Rotation'],
         'Cost': ['$250', '$450', '$120']
     })
-    st.dataframe(maintenance_data, hide_index=True)
+    st.dataframe(maintenance_data, hide_index=True, use_container_width=True)
 
 # Custom Report Builder
 st.markdown("### 🛠️ Custom Report Builder")
