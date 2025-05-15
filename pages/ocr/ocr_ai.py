@@ -2,8 +2,11 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from datetime import datetime
+import pytesseract
+from PIL import Image
+from openai import OpenAI
 
-st.markdown("## Document Processing Center")
+st.header("🧾 OCR & Document Analysis")
 
 # Upload Section
 st.markdown("### 📑 Document Upload")
@@ -13,25 +16,23 @@ doc_type = st.selectbox(
     ["Invoice", "Receipt", "Contract", "ID Document", "Form"]
 )
 
-uploaded_files = st.file_uploader(
+img = st.file_uploader(
     "Upload Documents for Processing",
-    accept_multiple_files=True,
     type=['pdf', 'png', 'jpg', 'jpeg']
 )
 
-if uploaded_files:
-    st.success(f"{len(uploaded_files)} documents uploaded for processing")
-    
-    # Processing Status
-    st.markdown("### 🔄 Processing Status")
-    for file in uploaded_files:
-        col1, col2, col3 = st.columns([3, 1, 1])
-        with col1:
-            st.text(file.name)
-        with col2:
-            st.success("Processed")
-        with col3:
-            st.button("View Results", key=file.name)
+if img:
+    im = Image.open(img)
+    st.image(im, use_container_width=True)  # Using the correct parameter
+    try:
+        text = pytesseract.image_to_string(im, lang="ell")
+        st.text_area("Extracted Text:", text, height=200)
+        
+        if st.button("Analyze Document"):
+            with st.spinner("Analyzing..."):
+                st.success("Analysis complete!")
+    except Exception as e:
+        st.error(f"Error processing image: {str(e)}")
 
 # OCR Analytics
 st.markdown("### 📊 OCR Analytics")
@@ -90,7 +91,7 @@ with st.expander("OCR Settings"):
         )
         st.multiselect(
             "Language Support",
-            ["English", "Spanish", "French", "German", "Chinese"]
+            ["English", "Greek", "French", "German", "Spanish"]
         )
     with col2:
         st.selectbox(
