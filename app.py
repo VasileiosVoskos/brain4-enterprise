@@ -32,7 +32,8 @@ dump = lambda p, d: p.write_text(json.dumps(d, indent=2, ensure_ascii=False))
 
 def auth():
     """Secure authentication system with invite-based registration."""
-    st.sidebar.image("assets/logo.png", use_container_width=True)
+    # Changed from use_column_width to use_container_width
+    st.sidebar.image("assets/logo.png", width=160)  # Fixed width instead
     users, invites = load(USERS), load(INV)
 
     if "user" not in st.session_state:
