@@ -1,4 +1,3 @@
-# pages/ocr/ocr_ai.py
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -69,7 +68,7 @@ with tab2:
         'Score': [99.2, 98.8, 97.5],
         'Previous': [98.9, 98.5, 97.2]
     })
-    st.dataframe(quality_data, hide_index=True)
+    st.dataframe(quality_data, hide_index=True, use_container_width=True)
 
 # Recent Processing History
 st.markdown("### 📜 Recent Processing History")
@@ -79,7 +78,7 @@ history = pd.DataFrame({
     'Status': ['Completed', 'Completed', 'In Progress'],
     'Confidence': ['98%', '97%', '95%']
 })
-st.dataframe(history, hide_index=True)
+st.dataframe(history, hide_index=True, use_container_width=True)
 
 # OCR Settings
 with st.expander("OCR Settings"):
