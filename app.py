@@ -4,7 +4,7 @@ import os
 import streamlit as st
 from pathlib import Path
 from openai import OpenAI
-from datetime import datetime
+import time  # We'll use time instead of datetime
 
 # Professional page configuration
 st.set_page_config(
@@ -115,7 +115,7 @@ def auth():
                     users[u] = {
                         "pwd": p,
                         "role": "admin" if code == "ADMINCODE" else "user",
-                        "created_at": str(datetime.now())
+                        "created_at": str(int(time.time()))  # Using Unix timestamp instead
                     }
                     dump(USERS, users)
                     st.success("✅ Account created successfully! Please sign in.")
