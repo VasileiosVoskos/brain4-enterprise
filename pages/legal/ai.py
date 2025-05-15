@@ -1,4 +1,3 @@
-# pages/legal/ai.py
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -58,7 +57,7 @@ with tab2:
         'Risk Level': ['Low', 'Low', 'Medium', 'Low'],
         'Action Needed': ['None', 'None', 'Review', 'None']
     })
-    st.dataframe(analysis_data, hide_index=True)
+    st.dataframe(analysis_data, hide_index=True, use_container_width=True)
 
 # Compliance Checker
 st.markdown("### ⚖️ Compliance Checker")
@@ -102,4 +101,4 @@ recent_activity = pd.DataFrame({
     'Analysis Date': ['2024-03-01', '2024-02-28', '2024-02-27'],
     'Status': ['Completed', 'In Progress', 'Completed']
 })
-st.dataframe(recent_activity, hide_index=True)
+st.dataframe(recent_activity, hide_index=True, use_container_width=True)
