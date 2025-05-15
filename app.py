@@ -1,6 +1,7 @@
 import importlib, json, os, streamlit as st
 from pathlib import Path
 from openai import OpenAI
+from datetime import datetime
 
 # Professional page configuration
 st.set_page_config(
@@ -46,11 +47,11 @@ load = lambda p: json.loads(p.read_text())
 dump = lambda p, d: p.write_text(json.dumps(d, indent=2, ensure_ascii=False))
 
 def auth():
-    """Enterprise-grade authentication system with role management."""
+    """Secure authentication system with invite-based registration."""
     # Professional branding
     col1, col2 = st.sidebar.columns([1, 3])
     with col1:
-        st.image("assets/logo.png", use_column_width=True)
+        st.image("assets/logo.png", use_container_width=True)
     with col2:
         st.markdown("### brain4 Enterprise")
     
@@ -63,7 +64,7 @@ def auth():
         user_info = users[st.session_state.user]
         st.sidebar.success(f"Welcome, {st.session_state.user}")
         st.sidebar.info(f"Role: {user_info['role'].title()}")
-        if st.sidebar.button("Sign Out", key="logout"):
+        if st.sidebar.button("Sign Out"):
             st.session_state.user = None
             st.experimental_rerun()
         return True
@@ -73,26 +74,28 @@ def auth():
 
     tab_login, tab_reg = st.tabs(["🔑 Sign In", "🆕 Create Account"])
 
+    # Professional login interface
     with tab_login:
-        st.markdown("### Access Your Account")
         with st.form("login_form"):
-            u = st.text_input("Username/Email", placeholder="Enter your username")
-            p = st.text_input("Password", type="password", placeholder="Enter your password")
-            submit = st.form_submit_button("Sign In")
+            st.markdown("### Sign In to Your Account")
+            u = st.text_input("Username/Email")
+            p = st.text_input("Password", type="password")
+            submit = st.form_submit_button("Sign In", use_container_width=True)
             if submit and u in users and users[u]["pwd"] == p:
                 st.session_state.user = u
                 st.experimental_rerun()
             elif submit:
                 st.error("Invalid credentials. Please try again.")
 
+    # Professional registration interface
     with tab_reg:
-        st.markdown("### Create Enterprise Account")
         with st.form("register_form"):
-            u = st.text_input("Username/Email", placeholder="Choose a username")
-            p = st.text_input("Password", type="password", placeholder="Create a strong password")
-            p2 = st.text_input("Confirm Password", type="password", placeholder="Repeat your password")
-            code = st.text_input("Enterprise Invitation Code", placeholder="Enter your invitation code")
-            submit = st.form_submit_button("Create Account")
+            st.markdown("### Create New Account")
+            u = st.text_input("Username/Email")
+            p = st.text_input("Set Password", type="password")
+            p2 = st.text_input("Confirm Password", type="password")
+            code = st.text_input("Enterprise Invitation Code")
+            submit = st.form_submit_button("Create Account", use_container_width=True)
             
             if submit:
                 if u in users:
